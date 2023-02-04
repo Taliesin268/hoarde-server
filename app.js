@@ -10,6 +10,8 @@ app.use(express.json());
 const getCards = require('./routes/getCards')
 app.use(getCards);
 
+app.use(express.static(__dirname + '/static'));
+
 app.listen(process.env.PORT, () => {
     console.log(`Listening at http://localhost:${process.env.PORT}`);
 })
