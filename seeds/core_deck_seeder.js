@@ -12,7 +12,7 @@ exports.seed = async function (knex) {
       type: 'Dragon',
       alignments: 'Lawful Good',
       rules_text: 'Lawful Good, unchangeable. Trumps unchangeable.',
-      image_url: '/src/assets/bahamut.png',
+      image_url: 'bahamut.png',
       image_options: '{"object-position": "25% 75%"}'
     },
     {
@@ -21,7 +21,7 @@ exports.seed = async function (knex) {
       type: 'Dragon',
       alignments: 'Chaotic Evil',
       rules_text: 'Chaotic Evil, unchangeable. Trumps unchangeable.',
-      image_url: '/src/assets/tiamat.png'
+      image_url: 'tiamat.png'
     },
     {
       name: 'Planetar',
