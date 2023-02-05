@@ -7,8 +7,8 @@ app.use(cors());
 app.use(express.json());
 
 // Routes
-const getCards = require('./routes/getCards')
-app.use(getCards);
+app.use(require('./routes/cards'));
+app.use(require('./routes/users'));
 
 app.use(express.static(__dirname + '/static'));
 
