@@ -51,8 +51,12 @@ class User {
             + this.usernameComponents.nouns[this.usernameComponents.nouns.length * Math.random() | 0]
     }
 
-    constructor(name) {
-        this.name = name;
+    constructor(name = '') {
+        if (!name) {
+            this.name = User.generateUsername()
+        } else {
+            this.name = name;
+        }
     }
 
     async save() {
