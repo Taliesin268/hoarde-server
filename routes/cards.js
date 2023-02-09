@@ -1,10 +1,8 @@
 const router = require('express').Router();
-const knex = require('knex')(require('../knexfile.js'))
+const cards = require('../data/cards');
 
 router.get('/cards', (req, res) => {
-    cards = knex.select().from('cards').then((rows) => {
-        res.send(JSON.stringify(rows));
-    });
+    res.send(JSON.stringify(cards));
 });
 
 module.exports = router;
