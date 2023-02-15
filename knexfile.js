@@ -14,5 +14,6 @@ module.exports = {
   },
   migrations: {
     tableName: 'knex_migrations'
-  }
+  },
+  timezone: process.env.TZ
 };

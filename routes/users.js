@@ -6,8 +6,9 @@ router.post('/users', (req, res) => {
     user.save().then(id => {
         res.send(JSON.stringify({
             message: `User successfully created with ID ${id}`,
-            data: {
-                id: id
+            user: {
+                id: id,
+                name: user.name
             }
         }));
     });

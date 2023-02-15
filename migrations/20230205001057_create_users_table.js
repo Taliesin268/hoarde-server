@@ -8,6 +8,7 @@ exports.up = function (knex) {
             .primary()
             .defaultTo(knex.raw("(UUID())"));
         table.string("name")
+        table.timestamps(true, true);
     });
 };
 
