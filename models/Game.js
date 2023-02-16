@@ -14,7 +14,7 @@ class Game {
     static async CreateGame(creator) {
         try {
                 let id = Utils.RandomIdGenerator.generateBase36ID();
-                console.log(`Creating game with ID ${id} and creator ${creator}`)
+                console.log(`Creating game with ID ${id} and creator ${creator.id}`)
 
                 await knex('games')
                     .insert({
