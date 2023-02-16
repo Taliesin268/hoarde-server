@@ -1,5 +1,4 @@
 const knex = require('knex')(require('../knexfile.js'))
-const crypto = require('crypto')
 
 class User {
     static usernameComponents = {
@@ -45,13 +44,35 @@ class User {
         ]
     }
 
+    name = null;
+    id = null;
+
     static generateUsername() {
         return this.usernameComponents.properNouns[this.usernameComponents.properNouns.length * Math.random() | 0]
             + this.usernameComponents.adjectives[this.usernameComponents.adjectives.length * Math.random() | 0]
             + this.usernameComponents.nouns[this.usernameComponents.nouns.length * Math.random() | 0]
     }
 
-    constructor(name = '') {
+    static async findUserById(id) {
+        try {
+            const result = await knex('users')
+                .select('id', 'name')
+                .where({ id: id });
+            if (result && result.length === 1) {
+                console.log('found user: ' + JSON.stringify(result[0]));
+                return new User(result[0].id, result[0].name);
+            } else {
+                throw new Error(`User with ID ${id} not found`);
+            }
+        } catch (error) {
+            console.error(error);
+            throw error;
+        }
+    }
+
+    constructor(id, name = '') {
+        if (!id) { throw new Error(`Invalid ID`) }
+        this.id = id
         if (!name) {
             this.name = User.generateUsername()
         } else {
@@ -60,13 +81,12 @@ class User {
     }
 
     async save() {
-        var uuid = crypto.randomUUID();
         await knex('users')
-            .insert({ id: uuid, name: this.name })
+            .insert({ id: this.id, name: this.name })
             .then(() => {
-                console.log(`Inserted new user ${uuid} ${this.name}`);
+                console.log(`Inserted new user ${this.id} ${this.name}`);
             }, this)
-        return uuid;
+        return this.id;
     }
 
 }

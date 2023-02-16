@@ -2,23 +2,23 @@
  * @param { import("knex").Knex } knex
  * @returns { Promise<void> }
  */
-exports.up = function(knex) {
+exports.up = function (knex) {
     return knex.schema.createTable('games', function (table) {
-        table.uuid("id")
+        table.string("id")
             .primary()
-            .defaultTo(knex.raw("(UUID())"));
         table.json("current_state");
         table.integer("iteration");
         table.uuid("player_bahamut").references('id').inTable('users');
         table.uuid("player_tiamat").references('id').inTable('users');
+        table.timestamps(true, true);
     });
-  
+
 };
 
 /**
  * @param { import("knex").Knex } knex
  * @returns { Promise<void> }
  */
-exports.down = function(knex) {
+exports.down = function (knex) {
     return knex.schema.dropTable('games');
 };

@@ -1,13 +1,14 @@
 const router = require('express').Router();
 const User = require('../models/User')
+const crypto = require('crypto')
 
 router.post('/users', (req, res) => {
-    var user = new User(req.body.name);
-    user.save().then(id => {
+    var user = new User(crypto.randomUUID(),req.body.name);
+    user.save().then(() => {
         res.send(JSON.stringify({
             message: `User successfully created with ID ${id}`,
             user: {
-                id: id,
+                id: user.id,
                 name: user.name
             }
         }));

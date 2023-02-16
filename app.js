@@ -9,6 +9,7 @@ app.use(express.json());
 // Routes
 app.use(require('./routes/cards'));
 app.use(require('./routes/users'));
+app.use(require('./routes/games'));
 
 app.use(express.static(__dirname + '/static'));
 
