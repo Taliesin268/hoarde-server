@@ -17,6 +17,15 @@ const io = new Server(server, {
     }
 });
 
+io.use((socket, next) => {
+    const gameId = socket.handshake.query.gameId
+    const userId = socket.handshake.query.userId
+
+    console.log(`Caught user ${userId} for game ${gameId} in middleware`);
+
+    next();
+})
+
 io.on('connection', (socket) => {
     console.log('a user connected');
 });
