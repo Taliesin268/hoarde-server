@@ -6,6 +6,21 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+// Setup Socket.IO
+const http = require('http');
+const { Server } = require('socket.io');
+const server = http.createServer(app);
+const io = new Server(server, {
+    cors: {
+        origin: "http://localhost:8080",
+        methods: ["GET", "POST"]
+    }
+});
+
+io.on('connection', (socket) => {
+    console.log('a user connected');
+});
+
 // Routes
 app.use(require('./routes/cards'));
 app.use(require('./routes/users'));
@@ -13,6 +28,6 @@ app.use(require('./routes/games'));
 
 app.use(express.static(__dirname + '/static'));
 
-app.listen(process.env.PORT, () => {
+server.listen(process.env.PORT, () => {
     console.log(`Listening at http://localhost:${process.env.PORT}`);
 })

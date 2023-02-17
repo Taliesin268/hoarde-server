@@ -6,7 +6,7 @@ router.post('/users', (req, res) => {
     var user = new User(crypto.randomUUID(),req.body.name);
     user.save().then(() => {
         res.send(JSON.stringify({
-            message: `User successfully created with ID ${id}`,
+            message: `User successfully created with ID ${user.id}`,
             user: {
                 id: user.id,
                 name: user.name
