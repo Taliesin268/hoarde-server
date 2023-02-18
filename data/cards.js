@@ -19,7 +19,7 @@ module.exports = [
     rules_text: "Add 10 gold to your opponent's wager.",
   },
   {
-    name: "Cthulu?",
+    name: "Cthulhu",
     wager: 10,
     rules_text:
       "Your opponent reveals their hand next round and must play if able.",
@@ -39,14 +39,14 @@ module.exports = [
     type: "Dragon",
   },
   {
-    name: "UNNAMED",
+    name: "Grootslang",
     wager: 9,
     rules_text: "Chaotic. Discard a card to play this card again.",
     alignments: "Chaotic",
     type: "Dragon",
   },
   {
-    name: "Azhdaha?",
+    name: "Azhdaha",
     wager: 9,
     rules_text: "Evil. Discard a card to play this card again.",
     alignments: "Evil",
