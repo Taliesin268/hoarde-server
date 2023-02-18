@@ -1,35 +1,18 @@
-const User = require("./User")
+const Model = require('./Model.js');
+const User = require('./User.js');
 const Utils = require("../engine/utils");
-const knex = require('knex')(require('../knexfile.js'))
 
-class Game {
-    id = null;
-    creator = null;
+class Game extends Model {
+    static _tableName = 'games'
 
-    constructor(id, creator) {
-        this.id = id
-        this.creator = creator
-    }
+    get id() { return this._db.id }
+    set id(value) { this._db.id = value }
+    get creator() { return User.find(this._db.player_bahamut) }
+    set creator(value) { this._db.player_bahamut = value.id }
 
-    static async CreateGame(creator) {
-        try {
-                let id = Utils.RandomIdGenerator.generateBase36ID();
-                console.log(`Creating game with ID ${id} and creator ${creator.id}`)
-
-                await knex('games')
-                    .insert({
-                        id: id, 
-                        player_bahamut: creator.id 
-                    })
-                    .then(() => {
-                        console.log(`Inserted new game ${id}`);
-                    }, this)
-
-                return new Game(id, creator);
-        } catch (error) {
-            console.error(error)
-            throw error
-        }
+    static _generateId() { return Utils.RandomIdGenerator.generateBase36ID(); }
+    _preSave() {
+        if (!this.creator) { throw new Error("Must have a creator when making a new game") }
     }
 }
 
