@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 require('dotenv').config();
 
+// Set up Express server
 const app = express();
 app.use(cors());
 app.use(express.json());
@@ -17,6 +18,7 @@ const io = new Server(server, {
     }
 });
 
+// Set up socket middleware for detecting connections
 io.use((socket, next) => {
     const gameId = socket.handshake.query.gameId
     const userId = socket.handshake.query.userId
@@ -26,7 +28,8 @@ io.use((socket, next) => {
     next();
 })
 
-io.on('connection', (socket) => {
+// Set up baseline connection for sockets
+io.on('connection', () => {
     console.log('a user connected');
 });
 
@@ -34,9 +37,9 @@ io.on('connection', (socket) => {
 app.use(require('./routes/cards'));
 app.use(require('./routes/users'));
 app.use(require('./routes/games'));
+app.use(express.static('./static'));
 
-app.use(express.static(__dirname + '/static'));
-
+// Start listening for traffic
 server.listen(process.env.PORT, () => {
     console.log(`Listening at http://localhost:${process.env.PORT}`);
 })
