@@ -26,20 +26,22 @@ class Game extends Model {
      * The user that created this game.
      * @type {User}
      */
-    get creator() { 
-        // Get the User object if it's already been saved, or find it if all we have is ID
-        if(this._creator) {
-            return this._creator 
-        } else if (this._db.player_bahamut) {
-            return User.find(this._db.player_bahamut)
-        } else {
-            return null
-        }
-    }
-    set creator(value) { 
+    get creator() { return this._creator }
+    set creator(value) {
         // Set the User object reference, and set the internal id
         this._creator = value
-        this._db.player_bahamut = value.id 
+        this._db.player_bahamut = value.id
+    }
+
+    /**
+     * The user that joined this game.
+     * @type {User}
+     */
+    get player() { return this._player }
+    set player(value) {
+        // Set the User object reference, and set the internal id
+        this._player = value
+        this._db.player_tiamat = value.id
     }
 
     /**
@@ -59,6 +61,25 @@ class Game extends Model {
      */
     _preSave() {
         if (!this.creator) { throw new Error("Must have a creator when making a new game") }
+    }
+
+    /**
+     * Fetches all the relationship for this class
+     * Overrides Model._fetchRelationships method
+     * @private
+     */
+    async _fetchRelationships() {
+        try {
+            if (this._db.player_bahamut) {
+                await User.find(this._db.player_bahamut).then((user) => { this.creator = user })
+            }
+            if (this._db.player_tiamat) {
+                await User.find(this._db.player_tiamat).then((user) => { this.player = user })
+            }
+
+        } catch (error) {
+            console.log('caught an error while fetching relationships')
+        }
     }
 }
 

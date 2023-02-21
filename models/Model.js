@@ -24,7 +24,9 @@ class Model {
                 .select()
                 .where({ id: id });
             if (result && result.length === 1) {
-                return new this(result[0]);
+                var model = new this(result[0]);
+                await model._fetchRelationships();
+                return model
             } else {
                 throw new Error(`${this.name} with ID ${id} not found`);
             }
@@ -49,6 +51,18 @@ class Model {
     _preSave() { }
 
     /**
+     * A hook that runs after the model is saved to the database.
+     * @private
+     */
+    async _postSave() { }
+
+    /**
+     * Fetches all the relationship for this class
+     * @private
+     */
+    async _fetchRelationships() { }
+
+    /**
      * Generates a new unique ID for a Model instance.
      * @returns {string} A randomly generated UUID string.
      * @private
@@ -61,7 +75,7 @@ class Model {
    */
     async save() {
         // Call the preSave hook for anything that needs to process before saving (such as setting Username)
-        this._preSave();
+        await this._preSave();
         if (this.id) {
             // If the ID is already set, then update the database
             await knex(this.constructor._tableName)
@@ -79,6 +93,7 @@ class Model {
                 }, this)
                 .catch((error) => { console.log(`Error while inserting ${this.constructor.name} - error: ${error}`) }, this)
         }
+        await this._postSave();
     }
 }
 
