@@ -1,5 +1,7 @@
-const router = require('express').Router();
-const User = require('../models/User')
+import express from 'express'
+import User from '../models/User.js'
+
+const router = express.Router();
 
 // Route for creating new users
 router.post('/users', (req, res) => {
@@ -16,4 +18,4 @@ router.post('/users', (req, res) => {
     });
 });
 
-module.exports = router;
+export default router;

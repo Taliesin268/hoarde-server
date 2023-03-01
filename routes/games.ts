@@ -1,6 +1,8 @@
-const router = require('express').Router();
-const Game = require('../models/Game');
-const User = require('../models/User')
+import express from 'express'
+import Game from '../models/Game.js'
+import User from '../models/User.js'
+
+const router = express.Router();
 
 // The route for creating a new game
 router.post('/games', async (req, res) => {
@@ -26,4 +28,4 @@ router.post('/games', async (req, res) => {
     }
 });
 
-module.exports = router;
+export default router;

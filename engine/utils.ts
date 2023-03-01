@@ -73,6 +73,4 @@ class RandomIdGenerator {
     }
 }
 
-module.exports = {
-    RandomIdGenerator
-}
+export default { RandomIdGenerator }

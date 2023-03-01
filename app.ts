@@ -1,8 +1,15 @@
-const express = require('express');
-const cors = require('cors');
-require('dotenv').config();
-const Game = require('./models/Game')
-const User = require('./models/User')
+import express, { Request, Response, NextFunction } from 'express';
+import cors from 'cors';
+import dotenv from 'dotenv';
+import { Server } from 'socket.io';
+import http from 'http';
+import Game from './models/Game.js';
+import User from './models/User.js';
+import cardsRouter from './routes/cards.js';
+import usersRouter from './routes/users.js';
+import gamesRouter from './routes/games.js';
+
+dotenv.config()
 
 // Set up Express server
 const app = express();
@@ -10,8 +17,6 @@ app.use(cors());
 app.use(express.json());
 
 // Setup Socket.IO
-const http = require('http');
-const { Server } = require('socket.io');
 const server = http.createServer(app);
 const io = new Server(server, {
     cors: {
@@ -22,8 +27,8 @@ const io = new Server(server, {
 
 // Set up socket middleware for detecting connections
 io.use((socket, next) => {
-    const gameId = socket.handshake.query.gameId
-    const userId = socket.handshake.query.userId
+    const gameId = socket.handshake.query.gameId as string
+    const userId = socket.handshake.query.userId as string
     console.log(`Caught user ${userId} for game ${gameId} in middleware`);
 
     if (!gameId || gameId == 'null' || !userId || userId == 'null') {
@@ -39,7 +44,6 @@ io.use((socket, next) => {
             // Check if the user is the creator of the lobby
             if (game.creator.id == userId) {
                 console.log('User is the creator!')
-                socket.id = `${gameId}/${userId}`
                 socket.join(gameId)
                 next();
             } else if (!game.player) {
@@ -48,14 +52,12 @@ io.use((socket, next) => {
                     console.log('User is a new player!')
                     game.player = user
                     game.save()
-                    socket.id = `${gameId}/${userId}`
                     socket.join(gameId)
                     next()
                 })
             } else if (game.player.id == userId) {
                 // Finally, check if the player is already in the game
                 console.log('User is a returning player!')
-                socket.id = `${gameId}/${userId}`
                 socket.join(gameId)
                 next()
             } else {
@@ -65,7 +67,7 @@ io.use((socket, next) => {
             }
         })
     } catch (error) {
-        next(error);
+        next(error as Error);
     }
 })
 
@@ -75,9 +77,9 @@ io.on('connection', () => {
 });
 
 // Routes
-app.use(require('./routes/cards'));
-app.use(require('./routes/users'));
-app.use(require('./routes/games'));
+app.use(cardsRouter);
+app.use(usersRouter);
+app.use(gamesRouter);
 app.use(express.static('./static'));
 
 // Start listening for traffic

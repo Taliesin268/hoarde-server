@@ -1,9 +1,11 @@
-const router = require('express').Router();
-const cards = require('../data/cards');
+import express from 'express'
+import cards from '../data/cards.js'
+
+const router = express.Router();
 
 // Return a JSON encoded string of all the cards in data.
 router.get('/cards', (req, res) => {
     res.send(JSON.stringify(cards));
 });
 
-module.exports = router;
+export default router;
