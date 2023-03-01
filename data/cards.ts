@@ -1,4 +1,4 @@
-module.exports = [
+export default [
   {
     name: "Quetzalcoatl",
     wager: 13,

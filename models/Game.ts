@@ -1,12 +1,12 @@
-const Model = require('./Model.js');
-const User = require('./User.js');
-const Utils = require("../engine/utils");
+import Model from './Model.js'
+import User from './User.js'
+import Utils from '../engine/utils.js'
 
 /**
  * A class representing a game.
  * @extends Model
  */
-class Game extends Model {
+export default class Game extends Model {
     /**
      * The name of the database table for users.
      * Overrides Model._tableName.
@@ -14,20 +14,15 @@ class Game extends Model {
      * @static
      */
     static _tableName = 'games'
-
-    /**
-     * The unique identifier of the game.
-     * @type {string}
-     */
-    get id() { return this._db.id }
-    set id(value) { this._db.id = value }
+    private _creator!: User;
+    private _player!: User;
 
     /**
      * The user that created this game.
-     * @type {User}
+     * @type {User | undefined}
      */
     get creator() { return this._creator }
-    set creator(value) {
+    set creator(value: User) {
         // Set the User object reference, and set the internal id
         this._creator = value
         this._db.player_bahamut = value.id
@@ -51,24 +46,24 @@ class Game extends Model {
      * @private
      * @static
      */
-    static _generateId() { return Utils.RandomIdGenerator.generateBase36ID(); }
+    static override _generateId() { return Utils.RandomIdGenerator.generateBase36ID(); }
 
     /**
      * Performs validation before saving the game to the database.
      * Overrides Model._preSave method.
      * @throws {Error} If the game does not have a creator.
-     * @private
+     * @protected
      */
-    _preSave() {
+    override _preSave() {
         if (!this.creator) { throw new Error("Must have a creator when making a new game") }
     }
 
     /**
      * Fetches all the relationship for this class
      * Overrides Model._fetchRelationships method
-     * @private
+     * @protected
      */
-    async _fetchRelationships() {
+    override async _fetchRelationships() {
         try {
             if (this._db.player_bahamut) {
                 await User.find(this._db.player_bahamut).then((user) => { this.creator = user })
@@ -82,5 +77,3 @@ class Game extends Model {
         }
     }
 }
-
-module.exports = Game

@@ -2,14 +2,16 @@
   "name": "hoarde-server",
   "version": "1.0.0",
   "description": "",
+  "type": "module",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "node app.js"
+    "dev": "npx tsc --allowJs && node ./dist/app.js"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@types/knex": "^0.16.1",
     "bcrypt": "^5.1.0",
     "cors": "^2.8.5",
     "dotenv": "^16.0.3",
@@ -17,6 +19,10 @@
     "jsonwebtoken": "^9.0.0",
     "knex": "^2.4.2",
     "mysql": "^2.18.1",
-    "socket.io": "^4.6.0"
+    "socket.io": "^4.6.0",
+    "typescript": "^4.9.5"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.17"
   }
 }
