@@ -15,8 +15,7 @@ const config: Knex.Config = {
     database: process.env.DB_NAME
   },
   migrations: {
-    tableName: 'knex_migrations',
-    directory: './dist/migrations'
+    tableName: 'knex_migrations'
   }
 }
 
