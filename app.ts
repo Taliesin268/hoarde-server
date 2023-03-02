@@ -72,8 +72,9 @@ io.use((socket, next) => {
 })
 
 // Set up baseline connection for sockets
-io.on('connection', () => {
+io.on('connection', (socket) => {
     console.log('a user connected');
+    socket.emit('game update', "message")
 });
 
 // Routes
