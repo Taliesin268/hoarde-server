@@ -1,0 +1,13 @@
+{
+  "type": "${env:DB_CLIENT}",
+  "host": "${env:DB_HOST}",
+  "port": "${env:DB_PORT}",
+  "username": "${env:DB_USER}",
+  "password": "${env:DB_PASS}",
+  "database": "${env:DB_NAME}",
+  "entities": ["/entities/**/*.ts"],
+  "migrations": ["/migrations/**/*.ts"],
+  "cli": {
+    "migrationsDir": "/migrations"
+  }
+}
