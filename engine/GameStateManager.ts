@@ -21,7 +21,7 @@ export default class GameStateManager {
         players: {
             creator: [],
             player: [],
-            guests: {}
+            guests: {} 
         },
     };
     private _game: Game;
@@ -76,9 +76,9 @@ export default class GameStateManager {
         } else {
             // They're a guest
             if (state.players.guests[socket.data.user.id] !== undefined) {
-                state.players.guests[socket.data.user.id].push(socket.id)
+                state.players.guests[socket.data.user.id].sockets.push(socket.id)
             } else {
-                state.players.guests[socket.data.user.id] = [socket.id]
+                state.players.guests[socket.data.user.id] = {name: socket.data.user.name, sockets: [socket.id]}
             }
         }
         return this._currentState;
@@ -94,11 +94,11 @@ export default class GameStateManager {
         if (playerIndex > -1) { state.players.creator.splice(playerIndex, 1) }
 
         // Remove from guests
-        let guestListSockets = state.players.guests[socket.data.user.id]
-        if (guestListSockets !== undefined) {
-            let guestIndex = guestListSockets.indexOf(socket.id)
-            if (guestIndex > -1) { guestListSockets.splice(guestIndex, 1) }
-            if(guestListSockets.length <= 0) {
+        let guest = state.players.guests[socket.data.user.id]
+        if (guest !== undefined) {
+            let guestIndex = guest.sockets.indexOf(socket.id)
+            if (guestIndex > -1) { guest.sockets.splice(guestIndex, 1) }
+            if(guest.sockets.length <= 0) {
                 delete state.players.guests[socket.data.user.id]
             }
         }

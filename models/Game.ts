@@ -42,12 +42,27 @@ export default class Game extends Model {
         this._db.player_tiamat = value ? value.id : null
     }
 
+    get iteration() { return this._db.iteration}
+    set iteration(value: Number) {
+        this._db.iteration = value
+    }
+
     get state() { return this._stateManager.getStateObject() }
 
     async processAction (action: string, content: Socket, io: Server) {
         await this._stateManager.processAction(action, content)
         this.save()
-        io.to(this.id).emit('game update', this.state)
+        io.to(this.id).emit('game update', this)
+    }
+
+    toJSON() {
+        return {
+            id: this.id,
+            iteration: this.iteration,
+            creator: this.creator,
+            player: this.player,
+            state: this.state,
+        }
     }
 
     /**

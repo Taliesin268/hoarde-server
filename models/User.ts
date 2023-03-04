@@ -31,4 +31,11 @@ export default class User extends Model {
             this.name = Utils.RandomIdGenerator.generateUsername();
         }
     }
+
+    toJSON() {
+        return {
+            id: this.id,
+            name: this.name
+        }
+    }
 }

@@ -21,7 +21,7 @@ type GameStateObject = {
     players: { // Strings are socket IDs
         creator: string[],
         player: string[],
-        guests: Record<string, string[]>
+        guests: Record<string, { name: string, sockets: string[]}>
     };
     game?: {
         deck: Card,
