@@ -66,13 +66,22 @@ export default class GameStateManager {
     async handleConnection(state: GameStateObject, data: Object): Promise<IGameState> {
         const socket = data as Socket
         await this._game.load()
-        console.log(`Game just finished loading. The creator is ${this._game.creator.id} and the socket is ${socket.data.user.id}`)
+
+        // Check if they're the creator
         if(this._game.creator.id == socket.data.user.id) {
-            console.log(`Detected that creator and socket are the same`)
-            // this is the creator
             this._stateObject.players.creator.push(socket.id)
         }
-        console.log(`State object is ${JSON.stringify(this._stateObject)}`)
+        // Check if they're the player
+        else if(typeof this._game.player !== 'undefined' && this._game.player.id == socket.data.user.id) {
+            this._stateObject.players.player.push(socket.id)
+        } else {
+            // They're a guest
+            if(this._stateObject.players.guests[socket.data.user.id] !== undefined) {
+                this._stateObject.players.guests[socket.data.user.id].push(socket.id)
+            } else {
+                this._stateObject.players.guests[socket.data.user.id] = [socket.id]
+            }
+        }
         return this._currentState;
     }
 

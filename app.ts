@@ -33,10 +33,11 @@ io.on(GAME_ACTIONS.CONNECT, async (socket) => {
         const game = await Game.find(socket.handshake.query.gameId)
         const user = await User.find(socket.handshake.query.userId)
         socket.data.game = game
+        socket.join(game.id)
         socket.data.user = user
         await game.processAction(GAME_ACTIONS.CONNECT, socket)
         console.log(`Sending data back to client`)
-        socket.emit('game update', game.state)
+        io.to(game.id).emit('game update', game.state)
     } catch (error) {
         console.log(`Caught error while connecting: ${error}`)
         socket.disconnect()
