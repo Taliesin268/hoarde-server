@@ -1,7 +1,7 @@
 import express, { Request, Response, NextFunction } from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
-import { Server } from 'socket.io';
+import { Server, Socket } from 'socket.io';
 import http from 'http';
 import Game from './models/Game.js';
 import User from './models/User.js';
@@ -26,6 +26,10 @@ const io = new Server(server, {
     }
 });
 
+function handleDisconnect(socket: Socket) {
+    socket.data.game.processAction(GAME_ACTIONS.DISCONNECT, socket, io)
+}
+
 // Set up baseline connection for sockets
 io.on(GAME_ACTIONS.CONNECT, async (socket) => {
     console.log('a user connected');
@@ -35,15 +39,17 @@ io.on(GAME_ACTIONS.CONNECT, async (socket) => {
         socket.data.game = game
         socket.join(game.id)
         socket.data.user = user
-        await game.processAction(GAME_ACTIONS.CONNECT, socket)
+        await game.processAction(GAME_ACTIONS.CONNECT, socket, io)
         console.log(`Sending data back to client`)
-        io.to(game.id).emit('game update', game.state)
+        socket.on(GAME_ACTIONS.DISCONNECT, async () => handleDisconnect(socket))
     } catch (error) {
         console.log(`Caught error while connecting: ${error}`)
         socket.disconnect()
         throw error
     }
 });
+
+
 
 // Routes
 app.use(cardsRouter);

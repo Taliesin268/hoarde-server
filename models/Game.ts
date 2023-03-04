@@ -2,6 +2,7 @@ import Model from './Model.js'
 import User from './User.js'
 import Utils from '../engine/utils.js'
 import GameStateManager from '../engine/GameStateManager.js';
+import { Server, Socket } from 'socket.io';
 
 /**
  * A class representing a game.
@@ -43,9 +44,10 @@ export default class Game extends Model {
 
     get state() { return this._stateManager.getStateObject() }
 
-    async processAction (action: string, content: Object) {
+    async processAction (action: string, content: Socket, io: Server) {
         await this._stateManager.processAction(action, content)
         this.save()
+        io.to(this.id).emit('game update', this.state)
     }
 
     /**
