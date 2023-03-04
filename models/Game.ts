@@ -42,8 +42,8 @@ export default class Game extends Model {
         this._db.player_tiamat = value ? value.id : null
     }
 
-    get iteration() { return this._db.iteration}
-    set iteration(value: Number) {
+    get iteration(): number { return this._db.iteration}
+    set iteration(value: number) {
         this._db.iteration = value
     }
 
@@ -51,6 +51,7 @@ export default class Game extends Model {
 
     async processAction (action: string, content: Socket, io: Server) {
         await this._stateManager.processAction(action, content)
+        this.iteration++
         this.save()
         io.to(this.id).emit('game update', this)
     }

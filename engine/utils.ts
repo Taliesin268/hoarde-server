@@ -52,7 +52,7 @@ class RandomIdGenerator {
     /**
      * Generates a Base36ID with a specified character length
      * 
-     * @param characters {Number} The amount of characters for the ID
+     * @param characters {number} The amount of characters for the ID
      * 
      * @return {String} Random Base36 ID
      */

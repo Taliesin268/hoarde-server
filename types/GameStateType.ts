@@ -7,7 +7,7 @@ type PlayerBoardState = {
         card: Card,
         visibility: Visibility
     }],
-    wager: Number,
+    wager: number,
     ethicalAlignment: {
         alignment: EthicalAlignment,
         traits: AlignmentTrait[]
@@ -31,16 +31,16 @@ type GameStateObject = {
         }],
         players: {
             creator: {
-                gold: Number
+                gold: number
             },
             player: {
-                gold: Number
+                gold: number
             }
         },
         effects: []; // TODO
         turn: Turn;
         round: {
-            number: Number,
+            number: number,
             moralAlignment: {
                 alignment: MoralAlignment,
                 traits: AlignmentTrait[]

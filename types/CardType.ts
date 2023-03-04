@@ -1,6 +1,6 @@
 type Card = {
     name: String;
-    wager: Number;
+    wager: number;
     rules_text: String;
     alignments?: String;
     type?: String;
