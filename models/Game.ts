@@ -1,6 +1,7 @@
 import Model from './Model.js'
 import User from './User.js'
 import Utils from '../engine/utils.js'
+import GameStateManager from '../engine/GameStateManager.js';
 
 /**
  * A class representing a game.
@@ -15,11 +16,12 @@ export default class Game extends Model {
      */
     static _tableName = 'games'
     private _creator!: User;
-    private _player!: User;
+    private _player: User | undefined;
+    private _stateManager!: GameStateManager
 
     /**
      * The user that created this game.
-     * @type {User | undefined}
+     * @type {User}
      */
     get creator() { return this._creator }
     set creator(value: User) {
@@ -30,13 +32,20 @@ export default class Game extends Model {
 
     /**
      * The user that joined this game.
-     * @type {User}
+     * @type {User|undefined}
      */
     get player() { return this._player }
-    set player(value) {
+    set player(value: User | undefined) {
         // Set the User object reference, and set the internal id
         this._player = value
-        this._db.player_tiamat = value.id
+        this._db.player_tiamat = value ? value.id : null
+    }
+
+    get state() { return this._stateManager.getStateObject() }
+
+    async processAction (action: string, content: Object) {
+        await this._stateManager.processAction(action, content)
+        this.save()
     }
 
     /**
@@ -56,6 +65,15 @@ export default class Game extends Model {
      */
     override _preSave() {
         if (!this.creator) { throw new Error("Must have a creator when making a new game") }
+        this._db.current_state = JSON.stringify(this._stateManager.getStateObject())
+    }
+
+    protected override _postLoad(): void {
+        console.log(`Current state is ${this._db.current_state}`)
+        if(typeof this._stateManager !== 'undefined') return
+        if(typeof this._db.current_state === 'undefined' || !this._db.current_state)
+            this._stateManager = new GameStateManager(this)
+        else this._stateManager = new GameStateManager(this, JSON.parse(this._db.current_state))
     }
 
     /**

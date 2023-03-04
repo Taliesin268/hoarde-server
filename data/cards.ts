@@ -1,4 +1,6 @@
-export default [
+import Card from '../types/CardType'
+
+const cards: Card[] = [
   {
     name: "Quetzalcoatl",
     wager: 13,
@@ -370,3 +372,5 @@ export default [
     alignments: "",
   },
 ]
+
+export default cards

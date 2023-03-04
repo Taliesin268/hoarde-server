@@ -39,18 +39,39 @@ export default abstract class Model {
                 throw new Error(`${this.name} with ID ${id} not found`);
             }
         } catch (error) {
-            console.error(error);
             throw error;
         }
     }
+
+    public async load(): Promise<void> {
+        try {
+            const promise = knex((this.constructor as unknown as typeof Model)._tableName)
+                .select()
+                .where({ id: this._db.id }).then((result) => {
+                    if (result && result.length === 1) {
+                        this._db = result[0]
+                        this._postLoad()
+                    } else {
+                        throw new Error(`${this.constructor.name} with ID ${this.id} not found`);
+                    }
+                })
+            return promise
+        } catch (error) {
+            throw error;
+        }
+    }
+
 
     /**
    * Creates a new Model instance.
    * @param {Object} [dbResult={}] - An object representing the database result.
    */
-    constructor(dbResult = {}) {
+    constructor(dbResult: Record<string, any> = {}) {
         this._db = dbResult;
+        this._postLoad();
     }
+
+    protected _postLoad(): void { }
 
     /**
      * A hook that runs before the model is saved to the database.
