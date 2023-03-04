@@ -1,4 +1,3 @@
-import { Socket } from "socket.io";
 import Card from "./CardType";
 
 type PlayerBoardState = {
