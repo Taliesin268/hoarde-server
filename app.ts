@@ -42,6 +42,9 @@ io.on(GAME_ACTIONS.CONNECT, async (socket) => {
         await game.processAction(GAME_ACTIONS.CONNECT, socket, io)
         console.log(`Sending data back to client`)
         socket.on(GAME_ACTIONS.DISCONNECT, async () => handleDisconnect(socket))
+        socket.on(GAME_ACTIONS.SELECT_OPPONENT, 
+            async (data: {id: string, name: string}) => socket.data.game.processAction(GAME_ACTIONS.SELECT_OPPONENT, data, io)
+        )
     } catch (error) {
         console.log(`Caught error while connecting: ${error}`)
         socket.disconnect()

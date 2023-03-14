@@ -49,17 +49,25 @@ export default class GameStateManager {
         this._currentState = GameStateManager.possibleStates[state.state];
     }
 
-    async processAction(action: string, content: Socket) {
-        console.log(`Processing Action ${action}`)
+    async processAction(action: string, content: Record<string, unknown>) {
+        console.log(`Processing Action '${action}'`)
         let newGameState = this._currentState
         if (this.globalActions[action] !== undefined) {
-            newGameState = await this.globalActions[action](this._stateObject, content)
+            if(GameStateManager.isSocket(content))
+                newGameState = await this.globalActions[action](this._stateObject, content)
+        } else if (this._currentState.actionsMap[action] !== undefined){
+            newGameState = await this._currentState.actionsMap[action](this._game, content)
         }
+
 
         this.setState(newGameState)
     }
 
-    getStateObject(): Record<string, any> {
+    static isSocket(variable: unknown): variable is Socket {
+        return variable instanceof Socket;
+    }
+
+    getStateObject(): GameStateObject {
         return this._stateObject
     }
 

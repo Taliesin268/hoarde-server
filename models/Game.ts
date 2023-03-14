@@ -3,6 +3,7 @@ import User from './User.js'
 import Utils from '../engine/utils.js'
 import GameStateManager from '../engine/GameStateManager.js';
 import { Server, Socket } from 'socket.io';
+import GameStateObject from '../types/GameStateType.js';
 
 /**
  * A class representing a game.
@@ -47,9 +48,9 @@ export default class Game extends Model {
         this._db.iteration = value
     }
 
-    get state() { return this._stateManager.getStateObject() }
+    get state(): GameStateObject { return this._stateManager.getStateObject() }
 
-    async processAction (action: string, content: Socket, io: Server) {
+    async processAction (action: string, content: Record<string, unknown>, io: Server) {
         await this._stateManager.processAction(action, content)
         this.iteration++
         this.save()
@@ -87,7 +88,6 @@ export default class Game extends Model {
     }
 
     protected override _postLoad(): void {
-        console.log(`Current state is ${this._db.current_state}`)
         if(typeof this._stateManager !== 'undefined') return
         if(typeof this._db.current_state === 'undefined' || !this._db.current_state)
             this._stateManager = new GameStateManager(this)
