@@ -20,7 +20,11 @@ export default class LobbyState implements IGameState {
         if (game.player != undefined) { LobbyState._returnPlayerToGuest(game) }
 
         game.player = await User.find(data.id)
-        game.state.players.player = game.state.players.guests[data.id].sockets
+        if (typeof game.state.players.guests[data.id] == 'undefined') {
+            game.state.players.player = []
+        } else {
+            game.state.players.player = game.state.players.guests[data.id].sockets
+        }
         delete game.state.players.guests[data.id]
 
         return this;
@@ -28,12 +32,16 @@ export default class LobbyState implements IGameState {
 
     static _returnPlayerToGuest(game: Game) {
         if (game.player == undefined) throw new Error('Player is supposed to be defined');
-        game.state.players.guests[game.player.id] = {
-            name: game.player.name,
-            sockets: game.state.players.player
+
+        if (game.state.players.player.length > 0) {
+            game.state.players.guests[game.player.id] = {
+                name: game.player.name,
+                sockets: game.state.players.player
+            }
         }
 
         delete game.player
+
     }
 
     async startGame(game: Game, data: Object): Promise<IGameState> {
