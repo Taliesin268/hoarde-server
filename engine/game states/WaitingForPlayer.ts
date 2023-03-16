@@ -5,6 +5,8 @@ export default class WaitingForPlayerState implements IGameState {
 
     };
 
-    onEnter(state: Object): void {};
-    onExit(state: Object): void {};
+    onEnter(state: Record<string, any>): void {
+        state.state = WaitingForPlayerState.name;
+    };
+    onExit(state: Record<string, any>): void { };
 }

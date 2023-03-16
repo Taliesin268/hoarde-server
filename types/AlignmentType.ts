@@ -1,16 +1,16 @@
-enum MoralAlignment {
+export const enum MoralAlignment {
     Good,
     Evil,
     Neutral
 }
 
-enum EthicalAlignment {
+export const enum EthicalAlignment {
     Lawful,
     Chaotic,
     Neutral
 }
 
-enum AlignmentTrait {
+export const enum AlignmentTrait {
     Unchangeable,
     Dragon
 }

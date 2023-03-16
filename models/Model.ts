@@ -14,14 +14,17 @@ export default abstract class Model {
      */
     protected _db: Record<string, any>;
     static _tableName: string;
-    public logger: Logger;
+    public logger!: Logger;
 
     /**
      * The unique identifier of the user.
      * @type {string}
      */
     get id() { return this._db.id }
-    set id(value) { this._db.id = value }
+    set id(value) { 
+        this._db.id = value 
+        this._resetLogger()
+    }
 
     /**
     * Finds a record by ID. Uses the model's _tableName and returns an instance of the model.
@@ -48,9 +51,11 @@ export default abstract class Model {
 
     public async load(): Promise<void> {
         try {
-            const promise = knex((this.constructor as unknown as typeof Model)._tableName)
+            this.logger.debug(`Loading game with id ${this.id}`)
+            await knex((this.constructor as unknown as typeof Model)._tableName)
                 .select()
-                .where({ id: this._db.id }).then((result) => {
+                .where({ id: this.id })
+                .then((result) => {
                     if (result && result.length === 1) {
                         this._db = result[0]
                         this._postLoad()
@@ -58,7 +63,6 @@ export default abstract class Model {
                         throw new Error(`${this.constructor.name} with ID ${this.id} not found`);
                     }
                 })
-            return promise
         } catch (error) {
             throw error;
         }
@@ -71,11 +75,16 @@ export default abstract class Model {
    */
     constructor(dbResult: Record<string, any> = {}) {
         this._db = dbResult;
-        this.logger = logger.child({ context: `${this.constructor.name}#${this.id}` })
         this._postLoad();
     }
 
-    protected _postLoad(): void { }
+    protected _resetLogger() {
+        this.logger = logger.child({ context: `${this.constructor.name}#${this.id}` })
+    }
+
+    protected _postLoad(): void { 
+        this._resetLogger()
+    }
 
     /**
      * A hook that runs before the model is saved to the database.
@@ -114,15 +123,15 @@ export default abstract class Model {
             await knex((<typeof Model>this.constructor)._tableName)
                 .where({ id: this.id })
                 .update(this._db)
-                .then(() => { console.log(`${this.constructor.name} ${this.id} Updated in DB`) })
-                .catch(() => { console.log(`Error while updating ${this.constructor.name}`) })
+                .then(() => { this.logger.debug(`${this.constructor.name} ${this.id} Updated in DB`) })
+                .catch(() => { this.logger.error(`Error while updating ${this.constructor.name}`) })
         } else {
             // If the ID isn't set, set it with _generateId(), then insert it
             this.id = (<typeof Model>this.constructor)._generateId();
             await knex((<typeof Model>this.constructor)._tableName)
                 .insert(this._db)
                 .then(() => {
-                    console.log(`Inserted new ${this.constructor.name} ${this.id}`);
+                    this.logger.info(`Inserted new ${this.constructor.name} ${this.id}`);
                 })
                 .catch((error: Error) => { console.log(`Error while inserting ${this.constructor.name} - error: ${error}`) })
         }

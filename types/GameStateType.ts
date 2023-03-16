@@ -2,10 +2,10 @@ import Card from "./CardType";
 
 type PlayerBoardState = {
     board: Card[],
-    hand: [{
+    hand: {
         card: Card,
         visibility: Visibility
-    }],
+    }[],
     wager: number,
     ethicalAlignment: {
         alignment: EthicalAlignment,
@@ -23,11 +23,11 @@ type GameStateObject = {
         guests: Record<string, { name: string, sockets: string[]}>
     };
     game?: {
-        deck: Card,
-        discard: [{
+        deck: Card[],
+        discard: {
             card: Card
             visibility: Visibility
-        }],
+        }[],
         players: {
             creator: {
                 gold: number

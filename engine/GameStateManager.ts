@@ -4,18 +4,22 @@ import GAME_ACTIONS from "../types/GameActions.js";
 import GameStateObject from "../types/GameStateType";
 import IGameState from "./game states/IGameState"
 import LobbyState from "./game states/Lobby.js"
+import ProcessingState from "./game states/Processing.js";
+import WaitingForPlayerState from "./game states/WaitingForPlayer.js";
 
 export default class GameStateManager {
     static possibleStates: Record<string, IGameState> = {
-        [LobbyState.name]: new LobbyState
+        [LobbyState.name]: new LobbyState,
+        [ProcessingState.name]: new ProcessingState,
+        [WaitingForPlayerState.name]: new WaitingForPlayerState
     }
 
-    public globalActions: Record<string, (state: GameStateObject, socket: Socket) => Promise<IGameState>> = {
-        [GAME_ACTIONS.CONNECT]: (state, socket) => this.handleConnection(state, socket),
-        [GAME_ACTIONS.DISCONNECT]: (state, socket) => this.handleDisconnection(state, socket)
+    public globalActions: Record<string, (state: GameStateObject, socket: Socket, prevState: IGameState) => Promise<IGameState>> = {
+        [GAME_ACTIONS.CONNECT]: (state, socket, prevState) => this.handleConnection(state, socket, prevState),
+        [GAME_ACTIONS.DISCONNECT]: (state, socket, prevState) => this.handleDisconnection(state, socket, prevState)
     }
 
-    private _currentState: IGameState = new LobbyState;
+    private _currentState!: IGameState;
     private _stateObject: GameStateObject = {
         state: LobbyState.name,
         players: {
@@ -28,37 +32,42 @@ export default class GameStateManager {
 
     constructor(game: Game, state?: GameStateObject) {
         this._game = game
-        if (typeof state !== 'undefined') {
-            this.loadState(state)
-        }
+        this.loadState(state)
     }
 
     setState(state: IGameState) {
         if (this._currentState !== undefined) {
-            if (typeof this._currentState === typeof state) {
+            this._game.logger.debug(`Setting current state (${this._currentState.constructor.name}) to ${state.constructor.name}`)
+            if (state.constructor.name === this._currentState.constructor.name) {
                 return;
             }
             this._currentState.onExit(this._stateObject);
         }
         this._currentState = state;
         this._currentState.onEnter(this._stateObject);
+        this._game.logger.log('trace',`Successfully set state to ${state.constructor.name}`)
     }
 
-    loadState(state: GameStateObject) {
+    loadState(state: GameStateObject | undefined) {
+        if(state == undefined) { this._currentState = new LobbyState; return }
         this._stateObject = state;
         this._currentState = GameStateManager.possibleStates[state.state];
     }
 
     async processAction(action: string, content: Record<string, unknown>) {
-        console.log(`Processing Action '${action}'`)
+        this._game.logger.log('trace', `The current state is ${this._currentState.constructor.name}`)
+        // Create a new copy of the game state
         let newGameState = this._currentState
-        if (this.globalActions[action] !== undefined) {
-            if(GameStateManager.isSocket(content))
-                newGameState = await this.globalActions[action](this._stateObject, content)
-        } else if (this._currentState.actionsMap[action] !== undefined){
-            newGameState = await this._currentState.actionsMap[action](this._game, content)
-        }
+        this.setState(new ProcessingState());
+        await this._game.save();
 
+        if (this.globalActions[action] !== undefined) {
+            if(GameStateManager.isSocket(content)) {
+                newGameState = await this.globalActions[action](this._stateObject, content, newGameState)
+            }
+        } else if (newGameState.actionsMap[action] !== undefined){
+            newGameState = await newGameState.actionsMap[action](this._game, content)
+        }
 
         this.setState(newGameState)
     }
@@ -71,9 +80,7 @@ export default class GameStateManager {
         return this._stateObject
     }
 
-    async handleConnection(state: GameStateObject, socket: Socket): Promise<IGameState> {
-        await this._game.load()
-
+    async handleConnection(state: GameStateObject, socket: Socket, prevState: IGameState): Promise<IGameState> {
         // Check if they're the creator
         if (this._game.creator.id == socket.data.user.id) {
             state.players.creator.push(socket.id)
@@ -89,11 +96,13 @@ export default class GameStateManager {
                 state.players.guests[socket.data.user.id] = {name: socket.data.user.name, sockets: [socket.id]}
             }
         }
+
         this._game.logger.info(`A user connected: ${socket.data.user.id}`)
 
+        return prevState;
     }
 
-    async handleDisconnection(state: GameStateObject, socket: Socket): Promise<IGameState> {
+    async handleDisconnection(state: GameStateObject, socket: Socket, prevState: IGameState): Promise<IGameState> {
         // Remove from Creators
         let creatorIndex = state.players.creator.indexOf(socket.id)
         if (creatorIndex > -1) { state.players.creator.splice(creatorIndex, 1) }
@@ -112,6 +121,8 @@ export default class GameStateManager {
             }
         }
 
-        return this._currentState;
+        this._game.logger.info(`A user disconnected: ${socket.data.user.id}`)
+
+        return prevState;
     }
 }

@@ -9,6 +9,7 @@ import cardsRouter from './routes/cards.js';
 import usersRouter from './routes/users.js';
 import gamesRouter from './routes/games.js';
 import GAME_ACTIONS from './types/GameActions.js';
+import logger from './logger.js';
 
 dotenv.config()
 
@@ -26,27 +27,24 @@ const io = new Server(server, {
     }
 });
 
-function handleDisconnect(socket: Socket) {
-    socket.data.game.processAction(GAME_ACTIONS.DISCONNECT, socket, io)
-}
-
 // Set up baseline connection for sockets
 io.on(GAME_ACTIONS.CONNECT, async (socket) => {
-    console.log('a user connected');
     try {
-        const game = await Game.find(socket.handshake.query.gameId)
-        const user = await User.find(socket.handshake.query.userId)
-        socket.data.game = game
-        socket.join(game.id)
-        socket.data.user = user
-        await game.processAction(GAME_ACTIONS.CONNECT, socket, io)
-        console.log(`Sending data back to client`)
-        socket.on(GAME_ACTIONS.DISCONNECT, async () => handleDisconnect(socket))
-        socket.on(GAME_ACTIONS.SELECT_OPPONENT, 
-            async (data: {id: string, name: string}) => socket.data.game.processAction(GAME_ACTIONS.SELECT_OPPONENT, data, io)
+        socket.data.game = await Game.find(socket.handshake.query.gameId)
+        socket.join(socket.data.game.id)
+        socket.data.user = await User.find(socket.handshake.query.userId)
+        await socket.data.game.processAction(GAME_ACTIONS.CONNECT, socket, io)
+        socket.on(GAME_ACTIONS.DISCONNECT,
+            async () => await socket.data.game.processAction(GAME_ACTIONS.DISCONNECT, socket, io)
+        )
+        socket.on(GAME_ACTIONS.SELECT_OPPONENT,
+            async (data: { id: string, name: string }) => await socket.data.game.processAction(GAME_ACTIONS.SELECT_OPPONENT, data, io)
+        )
+        socket.on(GAME_ACTIONS.START_GAME,
+            async () => await socket.data.game.processAction(GAME_ACTIONS.START_GAME, {}, io)
         )
     } catch (error) {
-        console.log(`Caught error while connecting: ${error}`)
+        logger.error(`Caught error while connecting: ${error}`)
         socket.disconnect()
         throw error
     }
@@ -62,5 +60,5 @@ app.use(express.static('./static'));
 
 // Start listening for traffic
 server.listen(process.env.PORT, () => {
-    console.log(`Listening at http://localhost:${process.env.PORT}`);
+    logger.log('server', `Listening at http://localhost:${process.env.PORT}`);
 })

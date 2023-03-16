@@ -51,9 +51,13 @@ export default class Game extends Model {
     get state(): GameStateObject { return this._stateManager.getStateObject() }
 
     async processAction (action: string, content: Record<string, unknown>, io: Server) {
+        this.logger.info(`Processing Action '${action}'`)
+        await this.load()
+        this.logger.log('trace',`Before processing action, the state is ${this.state.state}`)
         await this._stateManager.processAction(action, content)
         this.iteration++
         this.save()
+        this.logger.info(`Emitting game update for action "${action}"!`)
         io.to(this.id).emit('game update', this)
     }
 
@@ -88,10 +92,17 @@ export default class Game extends Model {
     }
 
     protected override _postLoad(): void {
-        if(typeof this._stateManager !== 'undefined') return
-        if(typeof this._db.current_state === 'undefined' || !this._db.current_state)
+        if(this._stateManager == undefined) {
             this._stateManager = new GameStateManager(this)
-        else this._stateManager = new GameStateManager(this, JSON.parse(this._db.current_state))
+        } else {
+            this._stateManager = new GameStateManager(this, JSON.parse(this._db.current_state))
+        }
+        super._postLoad()
+    }
+
+    override async load() {
+        this.logger.log('trace', `Before loading, the state is ${this.state.state}`)
+        await super.load()
     }
 
     /**
@@ -109,7 +120,7 @@ export default class Game extends Model {
             }
 
         } catch (error) {
-            console.log('caught an error while fetching relationships')
+            this.logger.error('caught an error while fetching relationships')
         }
     }
 }
