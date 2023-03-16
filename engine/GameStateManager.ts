@@ -89,7 +89,8 @@ export default class GameStateManager {
                 state.players.guests[socket.data.user.id] = {name: socket.data.user.name, sockets: [socket.id]}
             }
         }
-        return this._currentState;
+        this._game.logger.info(`A user connected: ${socket.data.user.id}`)
+
     }
 
     async handleDisconnection(state: GameStateObject, socket: Socket): Promise<IGameState> {

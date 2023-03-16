@@ -1,5 +1,7 @@
 import crypto from 'crypto'
+import { Logger } from 'winston';
 import knex from '../knex.js'
+import logger from '../logger.js';
 
 /**
  * Base abstract class for other models
@@ -12,6 +14,7 @@ export default abstract class Model {
      */
     protected _db: Record<string, any>;
     static _tableName: string;
+    public logger: Logger;
 
     /**
      * The unique identifier of the user.
@@ -68,6 +71,7 @@ export default abstract class Model {
    */
     constructor(dbResult: Record<string, any> = {}) {
         this._db = dbResult;
+        this.logger = logger.child({ context: `${this.constructor.name}#${this.id}` })
         this._postLoad();
     }
 
