@@ -1,4 +1,6 @@
+import { AlignmentTrait, EthicalAlignment, MoralAlignment } from "./AlignmentType";
 import Card from "./CardType";
+import { Turn } from "./TurnEnum";
 
 type PlayerBoardState = {
     board: Card[],
