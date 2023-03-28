@@ -6,7 +6,6 @@ import GAME_ACTIONS from "../../types/GameActions.js";
 import { Turn } from "../../types/TurnEnum.js";
 import IGameState from "./IGameState";
 import WaitingForPlayerState from "./WaitingForPlayer.js";
-import logger from "../../logger.js";
 
 export default class LobbyState implements IGameState {
     actionsMap = {
@@ -54,13 +53,25 @@ export default class LobbyState implements IGameState {
     async startGame(game: Game, data: Object): Promise<IGameState> {
         game.logger.info('Starting Game')
 
-        // init game object
         this._initGameObject(game)
-        // shuffle deck
-        // start round
+        this._shuffleDeck(game)
+        
 
+        const endState = new WaitingForPlayerState
+        endState.startRound(game);
 
-        return new WaitingForPlayerState;
+        return endState
+    }
+
+    _shuffleDeck(game: Game) {
+        if(game.state.game == undefined) throw new Error("Cannot shuffle deck when there is no game")
+        let array = game.state.game.deck
+        for (let i = array.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            const temp = array[i];
+            array[i] = array[j];
+            array[j] = temp;
+        }
     }
 
     _initGameObject(game:Game) {
@@ -79,31 +90,22 @@ export default class LobbyState implements IGameState {
             turn: Turn.Creator,
             round: {
                 number: 0,
-                moralAlignment: {
-                    alignment: MoralAlignment.Neutral,
-                    traits: []
-                },
+                moralAlignment: MoralAlignment.Neutral,
                 players: {
                     creator: {
                         board: [],
                         hand: [],
                         wager: 0,
-                        ethicalAlignment: {
-                            alignment: EthicalAlignment.Neutral,
-                            traits: []
-                        },
-                        first: false,
+                        ethicalAlignment: EthicalAlignment.Neutral,
+                        turn: false,
                         resting: false
                     },
                     player: {
                         board: [],
                         hand: [],
                         wager: 0,
-                        ethicalAlignment: {
-                            alignment: EthicalAlignment.Neutral,
-                            traits: []
-                        },
-                        first: true,
+                        ethicalAlignment: EthicalAlignment.Neutral,
+                        turn: true,
                         resting: false
                     }
                 }

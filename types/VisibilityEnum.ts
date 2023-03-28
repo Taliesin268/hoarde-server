@@ -1,6 +1,6 @@
-enum Visibility {
-    Creator,
-    Player,
-    Private,
-    Public
+export const enum Visibility {
+    Creator = "Creator",
+    Player = "Player",
+    Private = "Private",
+    Public = "Public"
 }

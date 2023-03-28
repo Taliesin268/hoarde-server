@@ -1,6 +1,7 @@
-import { AlignmentTrait, EthicalAlignment, MoralAlignment } from "./AlignmentType";
+import { EthicalAlignment, MoralAlignment } from "./AlignmentType";
 import Card from "./CardType";
 import { Turn } from "./TurnEnum";
+import { Visibility } from "./VisibilityEnum";
 
 type PlayerBoardState = {
     board: Card[],
@@ -9,11 +10,8 @@ type PlayerBoardState = {
         visibility: Visibility
     }[],
     wager: number,
-    ethicalAlignment: {
-        alignment: EthicalAlignment,
-        traits: AlignmentTrait[]
-    },
-    first: boolean,
+    ethicalAlignment: EthicalAlignment,
+    turn: boolean,
     resting: boolean
 }
 
@@ -42,10 +40,7 @@ type GameStateObject = {
         turn: Turn;
         round: {
             number: number,
-            moralAlignment: {
-                alignment: MoralAlignment,
-                traits: AlignmentTrait[]
-            },
+            moralAlignment: MoralAlignment,
             players: {
                 creator: PlayerBoardState,
                 player: PlayerBoardState
