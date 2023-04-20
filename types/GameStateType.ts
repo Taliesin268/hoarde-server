@@ -4,9 +4,9 @@ import { Turn } from "./TurnEnum";
 import { Visibility } from "./VisibilityEnum";
 
 type PlayerBoardState = {
-    board: Card[],
+    board: number[],
     hand: {
-        card: Card,
+        card: number,
         visibility: Visibility
     }[],
     wager: number,
@@ -23,9 +23,9 @@ type GameStateObject = {
         guests: Record<string, { name: string, sockets: string[]}>
     };
     game?: {
-        deck: Card[],
+        deck: number[],
         discard: {
-            card: Card
+            card: number
             visibility: Visibility
         }[],
         players: {

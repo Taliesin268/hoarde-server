@@ -1,6 +1,6 @@
 import Card from '../types/CardType'
 
-const cards: Card[] = [
+const cards: Record<number,Card> = [
   {
     name: "Quetzalcoatl",
     wager: 13,

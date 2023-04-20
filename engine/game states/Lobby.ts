@@ -76,7 +76,7 @@ export default class LobbyState implements IGameState {
 
     _initGameObject(game:Game) {
         game.state.game = {
-            deck: cards,
+            deck: Object.keys(cards).map(Number),
             discard: [],
             players: {
                 creator: {

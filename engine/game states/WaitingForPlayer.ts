@@ -62,7 +62,7 @@ export default class WaitingForPlayerState implements IGameState {
         game.state.game.round = newRound
     }
 
-    _dealHand(hand: {card: Card, visibility: Visibility}[], deck: Card[], playerVisibility: Visibility) {
+    _dealHand(hand: {card: number, visibility: Visibility}[], deck: number[], playerVisibility: Visibility) {
         for(let i = 0; i < 4; i++) {
             hand.push(
                 {
