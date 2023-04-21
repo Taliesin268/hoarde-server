@@ -43,6 +43,8 @@ export default class Game extends Model {
         this._db.player_tiamat = value ? value.id : null
     }
 
+    get players() { return this.state.game?.round.players }
+
     get iteration(): number { return this._db.iteration}
     set iteration(value: number) {
         this._db.iteration = value
@@ -122,5 +124,21 @@ export default class Game extends Model {
         } catch (error) {
             this.logger.error('caught an error while fetching relationships')
         }
+    }
+
+    public getTurn(): 'player' | 'creator' {
+        if(this.state.game === undefined) throw Error("game not defined");
+        if(this.state.game.round.players.creator.turn) return 'creator';
+        if(this.state.game.round.players.player.turn) return 'player';
+        throw Error("could not find who's turn it is");
+    }
+
+    public payWager(player: 'player' | 'creator', amount: number): void {
+        if(this.state.game === undefined) throw Error("game not defined");
+        const wagerAmount = Math.min(amount, this.state.game.players[player].gold)
+        this.logger.log('debug', `Before paying the wager, the current gold is ${this.state.game.players[player].gold}`)
+        this.state.game.players[player].gold -= wagerAmount
+        this.players![player].wager += wagerAmount
+        this.logger.log('debug', `After paying the wager, the current gold is ${this.state.game.players[player].gold}`)
     }
 }
