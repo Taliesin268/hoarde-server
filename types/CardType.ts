@@ -4,6 +4,7 @@ type Card = {
     rules_text: String;
     alignments?: String;
     type?: String;
+    image?: String
 }
 
 export default Card
