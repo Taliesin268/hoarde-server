@@ -1,4 +1,6 @@
+import { EthicalAlignment, MoralAlignment } from '../types/AlignmentType'
 import Card from '../types/CardType'
+import { EFFECT_NAMES, Effect, Target } from '../types/Effects'
 
 const cards: Record<number,Card> = [
   {
@@ -21,7 +23,13 @@ const cards: Record<number,Card> = [
     name: "Kraken",
     wager: 10,
     rules_text: "Add 10 gold to your opponent's wager.",
-    image: "kraken.jpg"
+    image: "kraken.jpg",
+    effect: {
+      [EFFECT_NAMES.ADJUST_WAGER]: {
+        target: Target.ENEMY,
+        value: 10
+      }
+    }
   },
   {
     name: "Cthulhu",
@@ -81,28 +89,46 @@ const cards: Record<number,Card> = [
     wager: 8,
     rules_text: "Chaotic, unchangeable.",
     alignments: "Chaotic",
-    image: "demon"
+    image: "demon.webp"
   },
   {
     name: "Lich",
     wager: 8,
     rules_text: "Evil, unchangeable.",
     alignments: "Evil",
-    image: "lich"
+    image: "lich.webp"
   },
   {
     name: "Thunderbird",
     wager: 7,
     rules_text: "Lawful Good",
     alignments: "Lawful Good",
-    image: "thunderbird.png"
+    image: "thunderbird.png",
+    effect: {
+      [EFFECT_NAMES.SET_ALIGNMENT]: {
+        target: Target.PLAYER,
+        value: {
+          moral: MoralAlignment.Good,
+          ethical: EthicalAlignment.Lawful
+        }
+      }
+    }
   },
   {
     name: "Horned Serpent",
     wager: 7,
     rules_text: "Chaotic Evil",
     alignments: "Chaotic Evil",
-    image: "horned-serpent.jpg"
+    image: "horned-serpent.jpg",
+    effect: {
+      [EFFECT_NAMES.SET_ALIGNMENT]: {
+        target: Target.PLAYER,
+        value: {
+          moral: MoralAlignment.Evil,
+          ethical: EthicalAlignment.Chaotic
+        }
+      }
+    }
   },
   {
     name: "Vampire",
@@ -126,7 +152,7 @@ const cards: Record<number,Card> = [
     rules_text:
       "Lawful or Good, or this may gain the alignment of your last played card.",
     alignments: "Lawful Good",
-    image: "kitsune"
+    image: "kitsune.webp"
   },
   {
     name: 'Skin-Walker',
@@ -350,7 +376,7 @@ const cards: Record<number,Card> = [
     name: "Phoenix",
     wager: 5,
     rules_text: "Replay another card. Discard a card to play this card again.",
-    image: "phoenix"
+    image: "phoenix.webp"
   },
   {
     name: "Hydra",
