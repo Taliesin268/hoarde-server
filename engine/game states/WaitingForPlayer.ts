@@ -1,14 +1,16 @@
-import Game from "../../models/Game";
+import Game from "../../models/Game.js";
 import { EthicalAlignment, MoralAlignment } from "../../types/AlignmentType";
 import { Visibility } from "../../types/VisibilityEnum";
 import IGameState from "./IGameState";
 import GAME_ACTIONS from "../../types/GameActions.js";
 import cards from "../../data/cards.js";
 import { TurnState } from "../../types/TurnStateEnum";
+import User from "../../models/User.js";
 
 export default class WaitingForPlayerState implements IGameState {
     actionsMap = {
         [GAME_ACTIONS.ACTIVATE_CARD]: this.activateCard.bind(this),
+        [GAME_ACTIONS.END_TURN]: this.endTurn.bind(this)
     };
 
     onEnter(state: Record<string, any>): void {
@@ -102,6 +104,44 @@ export default class WaitingForPlayerState implements IGameState {
 
         return new WaitingForPlayerState
     }
+
+    async endTurn(game: Game, data: Record<string, unknown>): Promise<WaitingForPlayerState> {
+        if(game.state.game === undefined || 
+            game.player === undefined || 
+            !data.hasOwnProperty("user") ||
+            !(data.user instanceof User)
+            ) { 
+            game.logger.warn("end turn preassetion failed")
+            return this; 
+        }
+        if(game[game.getTurn()]!.id != data.user.id) { 
+            game.logger.debug("This player cannot end their turn. It is not their turn")
+            return this
+        }
+
+        let player = game.getTurn()
+        let enemy = Game.getOther(player)
+
+        if(game.players![enemy].turn == TurnState.Resting) {
+            // End round
+            game.logger.debug("Ending Round")
+            return this
+        }
+
+        switch (game.players![player].turn) {
+            case TurnState.FreePlayed:
+            case TurnState.Played:
+                game.players![player].turn = TurnState.Waiting
+                break;
+            case TurnState.Ready:
+                game.players![player].turn = TurnState.Resting
+                break;
+        }
+
+        game.players![enemy].turn = TurnState.Ready
+
+        return this
+    } 
 
     _dealHand(hand: { card: number, visibility: Visibility }[], deck: number[], playerVisibility: Visibility) {
         for (let i = 0; i < 4; i++) {

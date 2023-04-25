@@ -46,6 +46,9 @@ io.on(GAME_ACTIONS.CONNECT, async (socket) => {
         socket.on(GAME_ACTIONS.ACTIVATE_CARD,
             async (data: { card: number }) => await socket.data.game.processAction(GAME_ACTIONS.ACTIVATE_CARD, data, io)
         )
+        socket.on(GAME_ACTIONS.END_TURN,
+            async () => await socket.data.game.processAction(GAME_ACTIONS.END_TURN, { user: socket.data.user }, io)
+        )
     } catch (error) {
         logger.error(`Caught error while connecting: ${error}`)
         socket.disconnect()

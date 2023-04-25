@@ -1,4 +1,4 @@
-import Game from "../../models/Game";
+import Game from "../../models/Game.js";
 
 export default interface IGameState {
     actionsMap: Record<string, (game: Game, data: Record<string, unknown>) => Promise<IGameState>>;

@@ -94,13 +94,13 @@ export default class Game extends Model {
         this._db.current_state = JSON.stringify(this._stateManager.getStateObject())
     }
 
-    protected override _postLoad(): void {
+    protected override async _postLoad(): Promise<void> {
         if(this._stateManager == undefined) {
             this._stateManager = new GameStateManager(this)
         } else {
             this._stateManager = new GameStateManager(this, JSON.parse(this._db.current_state))
         }
-        super._postLoad()
+        await super._postLoad()
     }
 
     override async load() {
@@ -132,6 +132,10 @@ export default class Game extends Model {
         if(isPlayersTurn(this.state.game.round.players.creator.turn)) return 'creator';
         if(isPlayersTurn(this.state.game.round.players.player.turn)) return 'player';
         throw Error("could not find who's turn it is");
+    }
+
+    public static getOther(player: 'player' | 'creator'): 'player' | 'creator' {
+        return player == 'player' ? 'creator' : 'player'
     }
 
     public payWager(player: 'player' | 'creator', amount: number): void {

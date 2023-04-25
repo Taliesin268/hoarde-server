@@ -39,7 +39,7 @@ export default abstract class Model {
                 .where({ id: id });
             if (result && result.length === 1) {
                 var model = new this(result[0]);
-                await model._fetchRelationships();
+                await model._postLoad();
                 return model
             } else {
                 throw new Error(`${this.name} with ID ${id} not found`);
@@ -58,11 +58,11 @@ export default abstract class Model {
                 .then((result) => {
                     if (result && result.length === 1) {
                         this._db = result[0]
-                        this._postLoad()
                     } else {
                         throw new Error(`${this.constructor.name} with ID ${this.id} not found`);
                     }
                 })
+            await this._postLoad()
         } catch (error) {
             throw error;
         }
@@ -82,8 +82,9 @@ export default abstract class Model {
         this.logger = logger.child({ context: `${this.constructor.name}#${this.id}` })
     }
 
-    protected _postLoad(): void { 
+    protected async _postLoad(): Promise<void> { 
         this._resetLogger()
+        await this._fetchRelationships()
     }
 
     /**

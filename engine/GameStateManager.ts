@@ -1,5 +1,5 @@
 import { Socket } from "socket.io";
-import Game from "../models/Game"
+import Game from "../models/Game.js"
 import GAME_ACTIONS from "../types/GameActions.js";
 import GameStateObject from "../types/GameStateType";
 import IGameState from "./game states/IGameState"
