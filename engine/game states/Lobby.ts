@@ -4,6 +4,7 @@ import User from "../../models/User.js";
 import { EthicalAlignment, MoralAlignment } from "../../types/AlignmentType.js";
 import GAME_ACTIONS from "../../types/GameActions.js";
 import { Turn } from "../../types/TurnEnum.js";
+import { TurnState } from "../../types/TurnStateEnum.js";
 import IGameState from "./IGameState";
 import WaitingForPlayerState from "./WaitingForPlayer.js";
 
@@ -87,7 +88,6 @@ export default class LobbyState implements IGameState {
                 }
             },
             effects: [],
-            turn: Turn.Creator,
             round: {
                 number: 0,
                 moralAlignment: MoralAlignment.Neutral,
@@ -97,16 +97,14 @@ export default class LobbyState implements IGameState {
                         hand: [],
                         wager: 0,
                         ethicalAlignment: EthicalAlignment.Neutral,
-                        turn: false,
-                        resting: false
+                        turn: TurnState.Ready,
                     },
                     player: {
                         board: [],
                         hand: [],
                         wager: 0,
                         ethicalAlignment: EthicalAlignment.Neutral,
-                        turn: true,
-                        resting: false
+                        turn: TurnState.Waiting,
                     }
                 }
             }

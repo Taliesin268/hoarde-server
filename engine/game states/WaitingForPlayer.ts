@@ -4,6 +4,7 @@ import { Visibility } from "../../types/VisibilityEnum";
 import IGameState from "./IGameState";
 import GAME_ACTIONS from "../../types/GameActions.js";
 import cards from "../../data/cards.js";
+import { TurnState } from "../../types/TurnStateEnum";
 
 export default class WaitingForPlayerState implements IGameState {
     actionsMap = {
@@ -40,16 +41,14 @@ export default class WaitingForPlayerState implements IGameState {
                     hand: [],
                     wager: 0,
                     ethicalAlignment: EthicalAlignment.Neutral,
-                    turn: !prevRound.players.creator.turn,
-                    resting: false
+                    turn: prevRound.number % 2 == 1 ? TurnState.Waiting : TurnState.Ready,
                 },
                 player: {
                     board: [],
                     hand: [],
                     wager: 0,
                     ethicalAlignment: EthicalAlignment.Neutral,
-                    turn: !prevRound.players.player.turn,
-                    resting: false
+                    turn: prevRound.number % 2 == 0 ? TurnState.Waiting : TurnState.Ready,
                 }
             }
         }

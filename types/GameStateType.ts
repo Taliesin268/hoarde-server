@@ -2,6 +2,9 @@ import { EthicalAlignment, MoralAlignment } from "./AlignmentType";
 import Card from "./CardType";
 import { Turn } from "./TurnEnum";
 import { Visibility } from "./VisibilityEnum";
+import { TurnState } from "./TurnStateEnum"
+
+
 
 type PlayerBoardState = {
     board: number[],
@@ -11,8 +14,7 @@ type PlayerBoardState = {
     }[],
     wager: number,
     ethicalAlignment: EthicalAlignment,
-    turn: boolean,
-    resting: boolean
+    turn: TurnState
 }
 
 type GameStateObject = {
@@ -37,7 +39,6 @@ type GameStateObject = {
             }
         },
         effects: []; // TODO
-        turn: Turn;
         round: {
             number: number,
             moralAlignment: MoralAlignment,

@@ -4,6 +4,7 @@ import Utils from '../engine/utils.js'
 import GameStateManager from '../engine/GameStateManager.js';
 import { Server, Socket } from 'socket.io';
 import GameStateObject from '../types/GameStateType.js';
+import { isPlayersTurn } from '../types/TurnStateEnum.js';
 
 /**
  * A class representing a game.
@@ -128,8 +129,8 @@ export default class Game extends Model {
 
     public getTurn(): 'player' | 'creator' {
         if(this.state.game === undefined) throw Error("game not defined");
-        if(this.state.game.round.players.creator.turn) return 'creator';
-        if(this.state.game.round.players.player.turn) return 'player';
+        if(isPlayersTurn(this.state.game.round.players.creator.turn)) return 'creator';
+        if(isPlayersTurn(this.state.game.round.players.player.turn)) return 'player';
         throw Error("could not find who's turn it is");
     }
 
