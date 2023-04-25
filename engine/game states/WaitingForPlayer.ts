@@ -79,6 +79,11 @@ export default class WaitingForPlayerState implements IGameState {
             return this
         }
 
+        if(game.players![game.getTurn()].turn != TurnState.Ready) {
+            game.logger.log('debug', 'The player cannot play anymore cards this turn')
+            return this
+        }
+
         // Pay wager
         game.payWager(game.getTurn(), cards[data.card].wager)
 
@@ -91,6 +96,9 @@ export default class WaitingForPlayerState implements IGameState {
 
         // Activate card effect
         // TODO
+
+        // Set Turn State
+        game.players![game.getTurn()].turn = TurnState.Played
 
         return new WaitingForPlayerState
     }
