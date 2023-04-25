@@ -338,11 +338,25 @@ const cards: Record<number,Card> = [
     image: "gargoyal.jpg"
   },
   {
+    name: "Gargoyle",
+    wager: 2,
+    rules_text: "Lawful or Good",
+    alignments: "Lawful Good",
+    image: "Gargoyle2.webp"
+  },
+  {
     name: "Mermaid",
     wager: 2,
     rules_text: "Lawful or Good",
     alignments: "Lawful Good",
     image: "mermaid.png"
+  },
+  {
+    name: "Mermaid",
+    wager: 2,
+    rules_text: "Lawful or Good",
+    alignments: "Lawful Good",
+    image: "Mermaid2.png"
   },
   {
     name: "Goblin",
@@ -352,11 +366,25 @@ const cards: Record<number,Card> = [
     image: "Goblin.png"
   },
   {
+    name: "Goblin",
+    wager: 2,
+    rules_text: "Chaotic or Evil",
+    alignments: "Chaotic Evil",
+    image: "Goblin2.gif"
+  },
+  {
     name: "Specter",
     wager: 2,
     rules_text: "Chaotic or Evil",
     alignments: "Chaotic Evil",
     image: "specter.jpeg"
+  },
+  {
+    name: "Specter",
+    wager: 2,
+    rules_text: "Chaotic or Evil",
+    alignments: "Chaotic Evil",
+    image: "Specter2.jpg"
   },
   {
     name: "Wendigo",

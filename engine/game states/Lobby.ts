@@ -90,6 +90,7 @@ export default class LobbyState implements IGameState {
             effects: [],
             round: {
                 number: 0,
+                turn: 1,
                 moralAlignment: MoralAlignment.Neutral,
                 players: {
                     creator: {

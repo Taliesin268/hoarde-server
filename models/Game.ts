@@ -146,4 +146,9 @@ export default class Game extends Model {
         this.players![player].wager += wagerAmount
         this.logger.log('debug', `After paying the wager, the current gold is ${this.state.game.players[player].gold}`)
     }
+
+    public getWhoWentFirstThisRound(): 'player' | 'creator' {
+        if(this.state.game === undefined) throw Error("game not defined");
+        return this.state.game.round.number % 2 == 0 ? 'player' : 'creator'
+    }
 }

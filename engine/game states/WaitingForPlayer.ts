@@ -23,19 +23,20 @@ export default class WaitingForPlayerState implements IGameState {
         const prevRound = game.state.game.round
 
         // Empty hand and board
-        game.state.game.discard.concat(
-            prevRound.players.player.hand,
-            prevRound.players.player.board.map(
+        game.state.game.discard.push(
+            ...prevRound.players.player.hand,
+            ...prevRound.players.player.board.map(
                 card => { return Object.assign({}, { card: card, visibility: Visibility.Public }) }
             ),
-            prevRound.players.creator.hand,
-            prevRound.players.creator.board.map(
+            ...prevRound.players.creator.hand,
+            ...prevRound.players.creator.board.map(
                 card => { return Object.assign({}, { card: card, visibility: Visibility.Public }) }
             )
         )
 
         const newRound = {
             number: prevRound.number + 1,
+            turn: 1,
             moralAlignment: MoralAlignment.Neutral,
             players: {
                 creator: {
@@ -81,7 +82,7 @@ export default class WaitingForPlayerState implements IGameState {
             return this
         }
 
-        if(game.players![game.getTurn()].turn != TurnState.Ready) {
+        if (game.players![game.getTurn()].turn != TurnState.Ready) {
             game.logger.log('debug', 'The player cannot play anymore cards this turn')
             return this
         }
@@ -91,9 +92,9 @@ export default class WaitingForPlayerState implements IGameState {
 
         // Move card to field
         game.players![game.getTurn()].hand.forEach((card, i) => {
-            if(card.card == data.card) game.players![game.getTurn()].hand.splice(i,1)
+            if (card.card == data.card) game.players![game.getTurn()].hand.splice(i, 1)
         })
-        
+
         game.players![game.getTurn()].board.push(data.card)
 
         // Activate card effect
@@ -106,15 +107,15 @@ export default class WaitingForPlayerState implements IGameState {
     }
 
     async endTurn(game: Game, data: Record<string, unknown>): Promise<WaitingForPlayerState> {
-        if(game.state.game === undefined || 
-            game.player === undefined || 
+        if (game.state.game === undefined ||
+            game.player === undefined ||
             !data.hasOwnProperty("user") ||
             !(data.user instanceof User)
-            ) { 
-            game.logger.warn("end turn preassetion failed")
-            return this; 
+        ) {
+            game.logger.warn("end turn preassertion failed")
+            return this;
         }
-        if(game[game.getTurn()]!.id != data.user.id) { 
+        if (game[game.getTurn()]!.id != data.user.id) {
             game.logger.debug("This player cannot end their turn. It is not their turn")
             return this
         }
@@ -122,9 +123,10 @@ export default class WaitingForPlayerState implements IGameState {
         let player = game.getTurn()
         let enemy = Game.getOther(player)
 
-        if(game.players![enemy].turn == TurnState.Resting) {
+        if (game.players![enemy].turn == TurnState.Resting) {
             // End round
             game.logger.debug("Ending Round")
+            this._endRound(game, this._determineWinner(game))
             return this
         }
 
@@ -134,14 +136,69 @@ export default class WaitingForPlayerState implements IGameState {
                 game.players![player].turn = TurnState.Waiting
                 break;
             case TurnState.Ready:
-                game.players![player].turn = TurnState.Resting
+                if (game.state.game.round.turn < 3) {
+                    // Forfeit Round
+                    this._forfeitRound(game)
+                    return this
+                }
+                else {
+                    game.players![player].turn = TurnState.Resting
+                }
                 break;
         }
 
         game.players![enemy].turn = TurnState.Ready
+        game.state.game.round.turn++;
 
         return this
-    } 
+    }
+
+    _forfeitRound(game: Game) {
+        // Get the first card in hand's wager amount
+        let loser = Game.getOther(game.getWhoWentFirstThisRound());
+        game.players![loser].wager += cards[game.players![loser].hand[0].card].wager
+        game.state.game!.players[loser].gold -= cards[game.players![loser].hand[0].card].wager
+        this._endRound(game, game.getWhoWentFirstThisRound())
+    }
+
+    _determineWinner(game: Game): 'creator' | 'player' {
+        if (game.state.game!.round.moralAlignment == MoralAlignment.Evil) {
+            // Evil 
+            if (game.state.game!.round.players.creator.ethicalAlignment == EthicalAlignment.Chaotic) {
+                // Chaotic Evil
+                return 'creator'
+            } else if (game.state.game!.round.players.creator.ethicalAlignment == EthicalAlignment.Lawful) {
+                // Lawful Evil
+                return 'player'
+            } else {
+                // Forfeit
+                return game.getWhoWentFirstThisRound();
+            }
+        } else if (game.state.game!.round.moralAlignment == MoralAlignment.Good) {
+            // Good
+            if (game.players!.creator.ethicalAlignment == EthicalAlignment.Chaotic) {
+                // Chaotic Good 
+                return 'player'
+            } else if (game.state.game!.round.players.creator.ethicalAlignment == EthicalAlignment.Lawful) {
+                // Lawful Good 
+                return 'creator'
+            } else {
+                // Forfeit
+                return game.getWhoWentFirstThisRound();
+            }
+        } else {
+            // Forfeit
+            return game.getWhoWentFirstThisRound();
+        }
+    }
+
+    _endRound(game: Game, winner: 'creator' | 'player') {
+        let loser = Game.getOther(winner)
+        game.state.game!.players[winner].gold +=
+            game.state.game!.round.players.creator.wager +
+            game.state.game!.round.players.player.wager;
+        this.startRound(game)
+    }
 
     _dealHand(hand: { card: number, visibility: Visibility }[], deck: number[], playerVisibility: Visibility) {
         for (let i = 0; i < 4; i++) {

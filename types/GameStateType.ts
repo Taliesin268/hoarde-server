@@ -41,6 +41,7 @@ type GameStateObject = {
         effects: []; // TODO
         round: {
             number: number,
+            turn: number,
             moralAlignment: MoralAlignment,
             players: {
                 creator: PlayerBoardState,
