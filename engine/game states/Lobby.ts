@@ -1,4 +1,4 @@
-import cards from "../../data/cards.js";
+import { cards } from "../../data/cards.js";
 import Game from "../../models/Game.js";
 import User from "../../models/User.js";
 import { EthicalAlignment, MoralAlignment } from "../../types/AlignmentType.js";

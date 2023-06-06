@@ -1,5 +1,5 @@
 import express from 'express'
-import cards from '../data/cards.js'
+import { cards, tokens } from '../data/cards.js'
 
 const router = express.Router();
 
@@ -7,5 +7,9 @@ const router = express.Router();
 router.get('/cards', (req, res) => {
     res.send(JSON.stringify(cards));
 });
+
+router.get('/tokens', (req, res) => {
+    res.send(JSON.stringify(tokens));
+})
 
 export default router;

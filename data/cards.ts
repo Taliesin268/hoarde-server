@@ -2,7 +2,42 @@ import { EthicalAlignment, MoralAlignment } from '../types/AlignmentType'
 import Card from '../types/CardType'
 import { EFFECT_NAMES, Effect, Target } from '../types/Effects'
 
-const cards: Record<number,Card> = [
+export const tokens: Record<string,Card> = {
+  "Benevolent Whelp": {
+    name: "Benevolent Whelp",
+    wager: 3,
+    rules_text: "Lawful.",
+    alignments: "Lawful",
+    type: "Dragon Token",
+    image: "blue-dragon-whelp.jpeg"
+  },
+  "Malevolent Whelp": {
+    name: "Malevolent Whelp",
+    wager: 3,
+    rules_text: "Chaotic.",
+    alignments: "Chaotic",
+    type: "Dragon Token",
+    image: "red-dragon-whelp.jpg"
+  },
+  "Caring Whelp": {
+    name: "Benevolent Whelp",
+    wager: 3,
+    rules_text: "Good.",
+    alignments: "Good",
+    type: "Dragon Token",
+    image: "bronze-dragon-whelp.jpeg"
+  },
+  "Malicious Whelp": {
+    name: "Malicious Whelp",
+    wager: 3,
+    rules_text: "Evil.",
+    alignments: "Evil",
+    type: "Dragon Token",
+    image: "black-dragon-whelp.webp"
+  },
+}
+
+export const cards: Record<number,Card> = [
   {
     name: "Quetzalcoatl",
     wager: 13,
@@ -486,5 +521,3 @@ const cards: Record<number,Card> = [
     image: "mimic.png"
   },
 ]
-
-export default cards

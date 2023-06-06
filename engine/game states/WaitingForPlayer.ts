@@ -3,7 +3,7 @@ import { EthicalAlignment, MoralAlignment } from "../../types/AlignmentType";
 import { Visibility } from "../../types/VisibilityEnum";
 import IGameState from "./IGameState";
 import GAME_ACTIONS from "../../types/GameActions.js";
-import cards from "../../data/cards.js";
+import { cards } from "../../data/cards.js";
 import { TurnState } from "../../types/TurnStateEnum";
 import User from "../../models/User.js";
 
